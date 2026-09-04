@@ -21,14 +21,15 @@
 
 .home__clock {
   font-size: 1.2rem;
-  color: #9aa0ac;
+  color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
 
 .home__calendar {
   flex: 1;
   border-radius: 20px;
-  background: #1d2029;
+  background: var(--surface);
+  box-shadow: 0 8px 24px -12px var(--shadow);
   padding: 1.25rem 1.5rem;
   display: flex;
   flex-direction: column;
@@ -40,14 +41,14 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: #c6c9d2;
+  color: var(--text-muted);
   font-size: 0.95rem;
 }
 
 .home__calendar-header button {
   border: none;
-  background: #2a2e3a;
-  color: #f5f5f7;
+  background: var(--surface-alt);
+  color: var(--text);
   border-radius: 999px;
   padding: 0.3rem 0.8rem;
   font-size: 0.85rem;
@@ -59,7 +60,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #6b7280;
+  color: var(--text-faint);
   font-size: 1.05rem;
 }
 
@@ -136,7 +137,8 @@
 
 .home__rewards {
   border-radius: 20px;
-  background: #1d2029;
+  background: var(--surface);
+  box-shadow: 0 8px 24px -12px var(--shadow);
   padding: 1.25rem 1.5rem;
 }
 
@@ -144,20 +146,20 @@
   display: flex;
   justify-content: space-between;
   font-size: 0.95rem;
-  color: #c6c9d2;
+  color: var(--text-muted);
   margin-bottom: 0.6rem;
 }
 
 .home__rewards-track {
   height: 18px;
   border-radius: 999px;
-  background: #2a2e3a;
+  background: var(--surface-alt);
   overflow: hidden;
 }
 
 .home__rewards-fill {
   height: 100%;
-  background: linear-gradient(90deg, #f7b733, #fc4a1a);
+  background: linear-gradient(90deg, var(--accent), var(--accent-strong));
   border-radius: 999px;
   transition: width 0.4s ease;
 }
