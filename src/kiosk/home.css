@@ -29,13 +29,63 @@
   flex: 1;
   border-radius: 20px;
   background: #1d2029;
-  padding: 1.5rem;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  overflow: hidden;
+}
+
+.home__calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #c6c9d2;
+  font-size: 0.95rem;
+}
+
+.home__calendar-header button {
+  border: none;
+  background: #2a2e3a;
+  color: #f5f5f7;
+  border-radius: 999px;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.home__calendar-empty {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #6b7280;
-  font-size: 1.1rem;
-  text-align: center;
+  font-size: 1.05rem;
+}
+
+.home__calendar-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow-y: auto;
+}
+
+.home__calendar-item {
+  display: flex;
+  gap: 0.75rem;
+  align-items: baseline;
+  border-left: 4px solid #4a90d9;
+  padding: 0.3rem 0 0.3rem 0.75rem;
+  font-size: 1rem;
+}
+
+.home__calendar-item-time {
+  color: #9aa0ac;
+  font-size: 0.85rem;
+  min-width: 4.5rem;
 }
 
 .home__rewards {

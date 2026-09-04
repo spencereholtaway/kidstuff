@@ -4,6 +4,7 @@ import { KID_LIST } from "../shared/kids.js";
 import { api } from "../shared/api.js";
 
 const app = document.getElementById("app");
+let refreshing = false;
 
 function renderClock(el) {
   const update = () => {
@@ -18,13 +19,46 @@ function renderClock(el) {
 }
 
 async function loadData() {
-  const [stars, rewards] = await Promise.all([api.get("/stars"), api.get("/rewards")]);
+  const [stars, rewards, calendar] = await Promise.all([
+    api.get("/stars"),
+    api.get("/rewards"),
+    api.get("/calendar"),
+  ]);
   const activeReward = rewards.find((r) => r.active);
-  return { stars, activeReward };
+  return { stars, activeReward, calendar };
+}
+
+function formatEventTime(event) {
+  if (event.allDay) return "All day";
+  return new Date(event.start).toLocaleTimeString(undefined, {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
+function calendarHtml(calendar) {
+  if (!calendar.events.length) {
+    return `<div class="home__calendar-empty">Nothing on the calendar yet</div>`;
+  }
+  return `
+    <ul class="home__calendar-list">
+      ${calendar.events
+        .slice(0, 6)
+        .map(
+          (e) => `
+        <li class="home__calendar-item" style="border-left-color:${e.color}">
+          <span class="home__calendar-item-time">${formatEventTime(e)}</span>
+          <span class="home__calendar-item-title">${e.title}</span>
+        </li>
+      `,
+        )
+        .join("")}
+    </ul>
+  `;
 }
 
 async function render() {
-  const { stars, activeReward } = await loadData();
+  const { stars, activeReward, calendar } = await loadData();
 
   app.innerHTML = `
     <div class="home">
@@ -33,7 +67,13 @@ async function render() {
         <div class="home__clock" id="clock"></div>
       </div>
 
-      <div class="home__calendar">Calendar coming soon</div>
+      <div class="home__calendar">
+        <div class="home__calendar-header">
+          <span>Upcoming</span>
+          <button id="calendar-refresh">${refreshing ? "Syncing…" : "↻ Refresh"}</button>
+        </div>
+        ${calendarHtml(calendar)}
+      </div>
 
       <div class="home__rewards">
         <div class="home__rewards-label">
@@ -54,6 +94,17 @@ async function render() {
   `;
 
   renderClock(document.getElementById("clock"));
+
+  document.getElementById("calendar-refresh").addEventListener("click", async () => {
+    refreshing = true;
+    render();
+    try {
+      await api.post("/sync-calendar", {});
+    } finally {
+      refreshing = false;
+      render();
+    }
+  });
 
   const tiles = document.getElementById("kid-tiles");
   for (const kid of KID_LIST) {

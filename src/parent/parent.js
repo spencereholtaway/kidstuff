@@ -23,6 +23,8 @@ app.style.margin = "0 auto";
 let chores = [];
 let rewards = [];
 let stars = null;
+let google = { connected: false, calendars: [], selectedIds: [] };
+let googleNotice = null;
 
 /** Runs a write action; on 401 (session missing/expired) drops back to the login screen. */
 async function guarded(action) {
@@ -63,10 +65,11 @@ function renderLogin(message = "") {
 }
 
 async function loadAll() {
-  [chores, rewards, stars] = await Promise.all([
+  [chores, rewards, stars, google] = await Promise.all([
     api.get("/chores"),
     api.get("/rewards"),
     api.get("/stars"),
+    api.get("/google-calendars"),
   ]);
 }
 
@@ -118,6 +121,35 @@ function render() {
     </section>
 
     <section>
+      <h2>Google Calendar</h2>
+      ${googleNotice ? `<p style="color:${googleNotice.ok ? "#15803d" : "#b91c1c"};">${googleNotice.text}</p>` : ""}
+      ${
+        google.connected
+          ? `
+            <p>Connected. Pick which calendars show on the kiosk:</p>
+            <form id="calendars-form">
+              ${google.calendars
+                .map(
+                  (c) => `
+                <label style="display:block;">
+                  <input type="checkbox" name="calendarIds" value="${c.id}" ${
+                    google.selectedIds.includes(c.id) ? "checked" : ""
+                  } />
+                  ${c.summary}${c.primary ? " (primary)" : ""}
+                </label>
+              `,
+                )
+                .join("")}
+              <button type="submit">Save selection</button>
+            </form>
+            <button id="google-sync-now" style="margin-top:0.5rem;">Sync now</button>
+            <button id="google-disconnect" style="margin-top:0.5rem;">Disconnect</button>
+          `
+          : `<a href="/api/google-oauth-start"><button type="button">Connect Google Calendar</button></a>`
+      }
+    </section>
+
+    <section>
       <h2>Chores</h2>
       <ul style="list-style:none;padding:0;margin:0 0 1rem;">
         ${chores.map(choreRow).join("") || "<li>No chores yet</li>"}
@@ -155,6 +187,35 @@ function render() {
   document.getElementById("logout").addEventListener("click", async () => {
     await api.del("/auth");
     renderLogin();
+  });
+
+  document.getElementById("calendars-form")?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const calendarIds = new FormData(e.target).getAll("calendarIds");
+    guarded(async () => {
+      await api.post("/google-calendars", { calendarIds });
+      googleNotice = { ok: true, text: "Calendar selection saved." };
+      await refresh();
+    });
+  });
+
+  document.getElementById("google-sync-now")?.addEventListener("click", () => {
+    guarded(async () => {
+      const result = await api.post("/sync-calendar", {});
+      googleNotice = result.synced
+        ? { ok: true, text: `Synced ${result.events.length} events.` }
+        : { ok: false, text: `Sync skipped: ${result.reason}` };
+      render();
+    });
+  });
+
+  document.getElementById("google-disconnect")?.addEventListener("click", () => {
+    if (!confirm("Disconnect Google Calendar?")) return;
+    guarded(async () => {
+      await api.del("/google-calendars");
+      googleNotice = { ok: true, text: "Disconnected." };
+      await refresh();
+    });
   });
 
   document.getElementById("chore-form").addEventListener("submit", (e) => {
@@ -227,8 +288,20 @@ function render() {
   });
 }
 
+function consumeGoogleRedirectNotice() {
+  const params = new URLSearchParams(window.location.search);
+  const google = params.get("google");
+  if (!google) return;
+  googleNotice =
+    google === "connected"
+      ? { ok: true, text: "Google Calendar connected." }
+      : { ok: false, text: params.get("message") || "Google Calendar connection failed." };
+  window.history.replaceState({}, "", window.location.pathname);
+}
+
 async function init() {
   app.innerHTML = "Loading…";
+  consumeGoogleRedirectNotice();
   const { authenticated } = await api.get("/auth");
   if (!authenticated) {
     renderLogin();
