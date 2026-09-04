@@ -6,11 +6,11 @@ import { upcomingDays, isoDate } from "../shared/days.js";
 
 const app = document.getElementById("app");
 let refreshing = false;
-let selectedDayIso = null; // null = "Upcoming" view across all days
 
 const days = upcomingDays(7);
 const todayIso = days[0].iso;
 const todayDayCode = days[0].dayCode;
+let selectedDayIso = todayIso;
 
 function startOfWeekIso() {
   const d = new Date();
@@ -52,14 +52,10 @@ function formatEventTime(event) {
 }
 
 function calendarListHtml(calendar) {
-  const events = selectedDayIso
-    ? calendar.events.filter((e) => isoDate(new Date(e.start)) === selectedDayIso)
-    : calendar.events.slice(0, 6);
+  const events = calendar.events.filter((e) => isoDate(new Date(e.start)) === selectedDayIso);
 
   if (!events.length) {
-    return `<div class="home__calendar-empty">${
-      selectedDayIso ? "Nothing that day" : "Nothing on the calendar yet"
-    }</div>`;
+    return `<div class="home__calendar-empty">Nothing that day</div>`;
   }
   return `
     <ul class="home__calendar-list">
@@ -141,7 +137,7 @@ async function render() {
         <div class="home__calendar">
           <div class="home__calendar-days" id="calendar-days">${calendarDaysHtml()}</div>
           <div class="home__calendar-header">
-            <span>${selectedDayIso ? days.find((d) => d.iso === selectedDayIso).label : "Upcoming"}</span>
+            <span>${days.find((d) => d.iso === selectedDayIso).label}</span>
             <button id="calendar-refresh">${refreshing ? "Syncing…" : "↻ Refresh"}</button>
           </div>
           <div id="calendar-list">${calendarListHtml(calendar)}</div>
@@ -177,8 +173,7 @@ async function render() {
   document.getElementById("calendar-days").addEventListener("click", (e) => {
     const btn = e.target.closest(".home__calendar-day");
     if (!btn) return;
-    const iso = btn.dataset.iso;
-    selectedDayIso = selectedDayIso === iso ? null : iso;
+    selectedDayIso = btn.dataset.iso;
     render();
   });
 
