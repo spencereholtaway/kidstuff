@@ -24,6 +24,44 @@ let chores = [];
 let rewards = [];
 let stars = null;
 
+/** Runs a write action; on 401 (session missing/expired) drops back to the login screen. */
+async function guarded(action) {
+  try {
+    await action();
+  } catch (err) {
+    if (err.status === 401) {
+      renderLogin("Session expired — please log in again.");
+    } else {
+      alert(err.message);
+    }
+  }
+}
+
+function renderLogin(message = "") {
+  app.innerHTML = `
+    <div style="max-width:280px;margin:4rem auto;text-align:center;">
+      <h1>Parent login</h1>
+      ${message ? `<p style="color:#b91c1c;">${message}</p>` : ""}
+      <form id="login-form">
+        <input name="pin" type="password" inputmode="numeric" autocomplete="off" placeholder="PIN" style="font-size:1.2rem;padding:0.5rem;width:100%;box-sizing:border-box;" autofocus />
+        <button type="submit" style="margin-top:0.75rem;width:100%;padding:0.5rem;">Log in</button>
+      </form>
+    </div>
+  `;
+
+  document.getElementById("login-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const pin = new FormData(e.target).get("pin");
+    try {
+      await api.post("/auth", { pin });
+      await loadAll();
+      render();
+    } catch (err) {
+      renderLogin(err.message);
+    }
+  });
+}
+
 async function loadAll() {
   [chores, rewards, stars] = await Promise.all([
     api.get("/chores"),
@@ -66,7 +104,10 @@ function rewardRow(reward) {
 
 function render() {
   app.innerHTML = `
-    <h1>Parent panel</h1>
+    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+      <h1>Parent panel</h1>
+      <button id="logout">Log out</button>
+    </div>
 
     <section>
       <h2>Stars</h2>
@@ -111,7 +152,12 @@ function render() {
     </section>
   `;
 
-  document.getElementById("chore-form").addEventListener("submit", async (e) => {
+  document.getElementById("logout").addEventListener("click", async () => {
+    await api.del("/auth");
+    renderLogin();
+  });
+
+  document.getElementById("chore-form").addEventListener("submit", (e) => {
     e.preventDefault();
     const form = new FormData(e.target);
     const days = form.getAll("days");
@@ -119,59 +165,77 @@ function render() {
       alert("Pick at least one day");
       return;
     }
-    await api.post("/chores", {
-      title: form.get("title"),
-      kid: form.get("kid"),
-      days,
-      starValue: Number(form.get("starValue")),
-      icon: form.get("icon") || undefined,
+    guarded(async () => {
+      await api.post("/chores", {
+        title: form.get("title"),
+        kid: form.get("kid"),
+        days,
+        starValue: Number(form.get("starValue")),
+        icon: form.get("icon") || undefined,
+      });
+      await refresh();
     });
-    await refresh();
   });
 
-  document.getElementById("reward-form").addEventListener("submit", async (e) => {
+  document.getElementById("reward-form").addEventListener("submit", (e) => {
     e.preventDefault();
     const form = new FormData(e.target);
-    await api.post("/rewards", {
-      title: form.get("title"),
-      starCost: Number(form.get("starCost")),
+    guarded(async () => {
+      await api.post("/rewards", {
+        title: form.get("title"),
+        starCost: Number(form.get("starCost")),
+      });
+      await refresh();
     });
-    await refresh();
   });
 
   app.querySelectorAll("[data-delete-chore]").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      await api.del(`/chores?id=${btn.dataset.deleteChore}`);
-      await refresh();
+    btn.addEventListener("click", () => {
+      guarded(async () => {
+        await api.del(`/chores?id=${btn.dataset.deleteChore}`);
+        await refresh();
+      });
     });
   });
 
   app.querySelectorAll("[data-toggle-reward]").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      const reward = rewards.find((r) => r.id === btn.dataset.toggleReward);
-      await api.patch("/rewards", { id: reward.id, active: !reward.active });
-      await refresh();
+    btn.addEventListener("click", () => {
+      guarded(async () => {
+        const reward = rewards.find((r) => r.id === btn.dataset.toggleReward);
+        await api.patch("/rewards", { id: reward.id, active: !reward.active });
+        await refresh();
+      });
     });
   });
 
   app.querySelectorAll("[data-delete-reward]").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      await api.del(`/rewards?id=${btn.dataset.deleteReward}`);
-      await refresh();
+    btn.addEventListener("click", () => {
+      guarded(async () => {
+        await api.del(`/rewards?id=${btn.dataset.deleteReward}`);
+        await refresh();
+      });
     });
   });
 
   app.querySelectorAll("[data-redeem-reward]").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      try {
+    btn.addEventListener("click", () => {
+      guarded(async () => {
         await api.post("/redemptions", { rewardId: btn.dataset.redeemReward });
         await refresh();
-      } catch (err) {
-        alert(err.message);
-      }
+      });
     });
   });
 }
 
-app.innerHTML = "Loading…";
-refresh();
+async function init() {
+  app.innerHTML = "Loading…";
+  const { authenticated } = await api.get("/auth");
+  if (!authenticated) {
+    renderLogin();
+    return;
+  }
+  await loadAll();
+  render();
+}
+
+init();

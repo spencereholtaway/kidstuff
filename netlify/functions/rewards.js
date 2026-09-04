@@ -1,4 +1,5 @@
 import { readJSON, writeJSON, jsonResponse, errorResponse } from "./lib/store.js";
+import { requireAuth } from "./lib/auth.js";
 
 const KEY = "rewards/definitions.json";
 
@@ -6,6 +7,9 @@ export default async (req) => {
   if (req.method === "GET") {
     return jsonResponse(await readJSON(KEY, []));
   }
+
+  const authError = await requireAuth(req);
+  if (authError) return authError;
 
   if (req.method === "POST") {
     const body = await req.json();

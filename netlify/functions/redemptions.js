@@ -1,5 +1,6 @@
 import { readJSON, writeJSON, jsonResponse, errorResponse } from "./lib/store.js";
 import { computeStars } from "./lib/stars.js";
+import { requireAuth } from "./lib/auth.js";
 
 const KEY = "rewards/redemptions.json";
 const REWARDS_KEY = "rewards/definitions.json";
@@ -10,6 +11,9 @@ export default async (req) => {
   }
 
   if (req.method === "POST") {
+    const authError = await requireAuth(req);
+    if (authError) return authError;
+
     const body = await req.json();
     const { rewardId } = body;
     if (!rewardId) return errorResponse("rewardId is required");
