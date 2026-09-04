@@ -1,5 +1,5 @@
 export const KIDS = {
-  jack: { id: "jack", displayName: "Jack", color: "#2fb6a3", avatar: "🍌" },
+  jack: { id: "jack", displayName: "Jack", color: "#2c4a73", avatar: "🍌" },
   jojo: { id: "jojo", displayName: "Jojo", color: "#f7a531", avatar: "🐈‍⬛" },
 };
 

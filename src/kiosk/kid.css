@@ -60,7 +60,7 @@
 }
 
 .daynav__day.is-selected {
-  background: var(--kid-color, #2fb6a3);
+  background: var(--kid-color, #2c4a73);
   color: #fff;
 }
 
@@ -104,7 +104,7 @@
 }
 
 .chore-item.is-done {
-  background: var(--kid-color, #2fb6a3);
+  background: var(--kid-color, #2c4a73);
   color: #fff;
 }
 
