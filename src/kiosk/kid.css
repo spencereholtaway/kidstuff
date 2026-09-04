@@ -14,8 +14,8 @@
 
 .kidpage__back {
   border: none;
-  background: #1d2029;
-  color: #f5f5f7;
+  background: var(--surface-alt);
+  color: var(--text);
   border-radius: 999px;
   width: 44px;
   height: 44px;
@@ -34,7 +34,7 @@
 .kidpage__stars {
   margin-left: auto;
   font-size: 1.2rem;
-  color: #f7b733;
+  color: var(--accent);
 }
 
 .daynav {
@@ -48,8 +48,8 @@
   min-width: 64px;
   border: none;
   border-radius: 14px;
-  background: #1d2029;
-  color: #c6c9d2;
+  background: var(--surface-alt);
+  color: var(--text-muted);
   padding: 0.7rem 0.5rem;
   display: flex;
   flex-direction: column;
@@ -60,7 +60,7 @@
 }
 
 .daynav__day.is-selected {
-  background: var(--kid-color, #2f7fd6);
+  background: var(--kid-color, #2c4a73);
   color: #fff;
 }
 
@@ -82,10 +82,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #6b7280;
+  color: var(--text-faint);
   font-size: 1.05rem;
   border-radius: 20px;
-  background: #1d2029;
+  background: var(--surface-alt);
 }
 
 .chore-item {
@@ -94,8 +94,9 @@
   gap: 0.75rem;
   border: none;
   border-radius: 16px;
-  background: #1d2029;
-  color: #f5f5f7;
+  background: var(--surface);
+  box-shadow: 0 4px 14px -8px var(--shadow);
+  color: var(--text);
   padding: 1rem 1.1rem;
   font-size: 1.1rem;
   text-align: left;
@@ -103,7 +104,8 @@
 }
 
 .chore-item.is-done {
-  background: var(--kid-color, #2f7fd6);
+  background: var(--kid-color, #2c4a73);
+  color: #fff;
 }
 
 .chore-item__icon {

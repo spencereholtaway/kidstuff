@@ -1,4 +1,5 @@
 import { readJSON, writeJSON, errorResponse } from "./lib/store.js";
+import { getRedirectUri } from "./lib/google.js";
 
 const TOKEN_URL = "https://oauth2.googleapis.com/token";
 const CONNECTION_KEY = "calendar/google-connection.json";
@@ -22,7 +23,7 @@ export default async (req) => {
     return errorResponse("missing code", 400);
   }
 
-  const redirectUri = `${url.origin}/api/google-oauth-callback`;
+  const redirectUri = getRedirectUri(url.origin);
 
   const tokenRes = await fetch(TOKEN_URL, {
     method: "POST",

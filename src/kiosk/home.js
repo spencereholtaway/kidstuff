@@ -65,8 +65,8 @@ function calendarListHtml(calendar) {
     <ul class="home__calendar-list">
       ${events
         .map(
-          (e) => `
-        <li class="home__calendar-item" style="border-left-color:${e.color}">
+          (e, i) => `
+        <li class="home__calendar-item home__calendar-item--${i % 4}" style="--evt: ${e.color}">
           <span class="home__calendar-item-time">${formatEventTime(e)}</span>
           <span class="home__calendar-item-title">${e.title}</span>
         </li>

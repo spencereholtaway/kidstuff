@@ -1,5 +1,15 @@
 const TOKEN_URL = "https://oauth2.googleapis.com/token";
 
+// Pin the redirect URI to a fixed, registered value instead of deriving it
+// from the incoming request's origin. Netlify's local dev proxy can end up
+// on a different port than netlify.toml's configured 8895 if a prior dev
+// server crashed without releasing it, which silently breaks Google's
+// redirect_uri allowlist check. Set GOOGLE_REDIRECT_URI in .env to whatever
+// is registered in the Google Cloud Console OAuth client.
+export function getRedirectUri(requestOrigin) {
+  return process.env.GOOGLE_REDIRECT_URI || `${requestOrigin}/api/google-oauth-callback`;
+}
+
 export async function getAccessToken(refreshToken) {
   const res = await fetch(TOKEN_URL, {
     method: "POST",

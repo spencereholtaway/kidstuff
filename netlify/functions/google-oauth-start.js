@@ -1,5 +1,6 @@
 import { errorResponse } from "./lib/store.js";
 import { requireAuth } from "./lib/auth.js";
+import { getRedirectUri } from "./lib/google.js";
 
 const SCOPE = "https://www.googleapis.com/auth/calendar.readonly";
 
@@ -11,7 +12,7 @@ export default async (req) => {
   if (!clientId) return errorResponse("GOOGLE_CLIENT_ID is not configured", 500);
 
   const url = new URL(req.url);
-  const redirectUri = `${url.origin}/api/google-oauth-callback`;
+  const redirectUri = getRedirectUri(url.origin);
 
   const authUrl = new URL("https://accounts.google.com/o/oauth2/v2/auth");
   authUrl.searchParams.set("client_id", clientId);

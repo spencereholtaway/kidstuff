@@ -1,3 +1,31 @@
+:root {
+  color-scheme: light dark;
+
+  --bg: #fbf6ec;
+  --surface: #ffffff;
+  --surface-alt: #f1ebdc;
+  --text: #2b2620;
+  --text-muted: #756d5f;
+  --text-faint: #a79f8f;
+  --accent: #f7b733;
+  --accent-strong: #ed9a1f;
+  --shadow: rgba(43, 38, 32, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14161c;
+    --surface: #1d2029;
+    --surface-alt: #2a2e3a;
+    --text: #f5f5f7;
+    --text-muted: #c6c9d2;
+    --text-faint: #7d8290;
+    --accent: #f7b733;
+    --accent-strong: #fc4a1a;
+    --shadow: rgba(0, 0, 0, 0.35);
+  }
+}
+
 * {
   box-sizing: border-box;
 }
@@ -14,8 +42,8 @@ body {
 
 body {
   font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
-  background: #14161c;
-  color: #f5f5f7;
+  background: var(--bg);
+  color: var(--text);
 }
 
 button {
