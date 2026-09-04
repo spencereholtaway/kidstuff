@@ -1,0 +1,97 @@
+.home {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  gap: 1.5rem;
+}
+
+.home__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.home__header h1 {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.home__clock {
+  font-size: 1.2rem;
+  color: #9aa0ac;
+  font-variant-numeric: tabular-nums;
+}
+
+.home__calendar {
+  flex: 1;
+  border-radius: 20px;
+  background: #1d2029;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+.home__rewards {
+  border-radius: 20px;
+  background: #1d2029;
+  padding: 1.25rem 1.5rem;
+}
+
+.home__rewards-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.95rem;
+  color: #c6c9d2;
+  margin-bottom: 0.6rem;
+}
+
+.home__rewards-track {
+  height: 18px;
+  border-radius: 999px;
+  background: #2a2e3a;
+  overflow: hidden;
+}
+
+.home__rewards-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #f7b733, #fc4a1a);
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+.home__kids {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.kid-tile {
+  flex: 1;
+  border: none;
+  border-radius: 20px;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.kid-tile__avatar {
+  font-size: 3rem;
+}
+
+.kid-tile__stars {
+  font-size: 1rem;
+  font-weight: 400;
+  opacity: 0.85;
+}
