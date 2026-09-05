@@ -8,6 +8,8 @@ import { buildRewardTiers } from "../shared/rewardTiers.js";
 import { ensureKioskUnlocked } from "../shared/kioskLock.js";
 import { flipSnapshot, flipAnimate } from "../shared/flip.js";
 
+const LOCK_ICON = `<svg class="chore-item__lock-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>`;
+
 const app = document.getElementById("app");
 const params = new URLSearchParams(window.location.search);
 const kid = KIDS[params.get("id")] ?? KIDS.jack;
@@ -65,13 +67,12 @@ function rewardTilesHtml() {
           <div class="reward-tile${unlocked ? " is-unlocked" : ""}">
             <div class="reward-tile__head">
               <span class="reward-tile__title">${reward.title}</span>
-              <span class="reward-tile__count">${progress}/${reward.starCost}⭐</span>
+              ${status}
             </div>
             <div class="reward-tile__bar">
               <div class="reward-tile__fill" style="width:${teamPct}%"></div>
               <div class="reward-tile__fill-mine" style="width:${minePct}%"></div>
             </div>
-            ${status}
           </div>
         `;
         })
@@ -158,16 +159,17 @@ function render() {
 
   function appendChoreItem(container, chore) {
     const done = isDone(chore.id, selectedIso);
+    const locked = selectedIso > todayIso;
     const item = document.createElement("button");
-    item.className = "chore-item" + (done ? " is-done" : "");
+    item.className = "chore-item" + (done ? " is-done" : "") + (locked ? " is-locked" : "");
     item.dataset.choreId = chore.id;
     item.innerHTML = `
-      <span class="chore-item__icon">${chore.icon}</span>
+      <span class="chore-item__icon">${locked ? LOCK_ICON : chore.icon}</span>
       <span class="chore-item__title">${chore.title}</span>
       <span class="chore-item__stars">${chore.starValue}⭐</span>
       <span class="chore-item__check"></span>
     `;
-    item.addEventListener("click", () => toggleChore(chore.id));
+    if (!locked) item.addEventListener("click", () => toggleChore(chore.id));
     container.appendChild(item);
   }
 

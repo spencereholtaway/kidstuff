@@ -64,16 +64,9 @@
 .reward-tile__head {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
   gap: 0.5rem;
   font-weight: 600;
-}
-
-.reward-tile__count {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  font-weight: 600;
-  white-space: nowrap;
 }
 
 .reward-tile__bar {
@@ -107,10 +100,12 @@
 .reward-tile__status {
   font-size: 0.8rem;
   color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .reward-tile__claim {
-  align-self: flex-start;
+  flex-shrink: 0;
   border: none;
   border-radius: 999px;
   background: var(--kid-color, var(--accent-strong));
@@ -124,18 +119,17 @@
 .daynav {
   display: flex;
   flex-shrink: 0;
-  gap: 0.6rem;
-  overflow-x: auto;
+  gap: 0.5rem;
 }
 
 .daynav__day {
-  flex: 0 0 auto;
-  min-width: 64px;
+  flex: 1 1 0;
+  min-width: 0;
   border: none;
   border-radius: 14px;
   background: var(--surface-alt);
   color: var(--text-muted);
-  padding: 0.7rem 0.5rem;
+  padding: 0.7rem 0.3rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -147,6 +141,13 @@
 .daynav__day.is-selected {
   background: var(--kid-color, #2c4a73);
   color: #fff;
+}
+
+.daynav__day > span:first-child {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .daynav__day-date {
@@ -204,6 +205,7 @@
     background 0.15s ease,
     opacity 0.15s ease;
   scroll-margin-top: 0.75rem;
+  min-height: 3.5rem;
 }
 
 .chore-item.is-done {
@@ -212,8 +214,25 @@
   opacity: 0.5;
 }
 
+.chore-item.is-locked {
+  cursor: default;
+  opacity: 0.6;
+}
+
 .chore-item__icon {
   font-size: 1.4rem;
+  width: 1.4em;
+  height: 1.4em;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chore-item__lock-icon {
+  width: 60%;
+  height: 60%;
+  color: var(--text-faint);
 }
 
 

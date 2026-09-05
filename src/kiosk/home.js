@@ -16,18 +16,6 @@ const todayIso = days[0].iso;
 const todayDayCode = days[0].dayCode;
 let calendarScrollTop = 0;
 
-function renderClock(el) {
-  const update = () => {
-    el.textContent = new Date().toLocaleString(undefined, {
-      weekday: "long",
-      hour: "numeric",
-      minute: "2-digit",
-    });
-  };
-  update();
-  setInterval(update, 30_000);
-}
-
 async function loadData() {
   const [calendar, chores, weekCompletions, rewards, stars] = await Promise.all([
     api.get("/calendar"),
@@ -61,10 +49,9 @@ function rewardTiersHtml(rewardTiers, bankAvailable) {
           <div class="reward-tile${unlocked ? " is-unlocked" : ""}">
             <div class="reward-tile__head">
               <span class="reward-tile__title">${reward.title}</span>
-              <span class="reward-tile__count">${progress}/${reward.starCost}⭐</span>
+              ${status}
             </div>
             <div class="reward-tile__bar"><div class="reward-tile__fill" style="width:${pct}%"></div></div>
-            ${status}
           </div>
         `;
         })
@@ -119,7 +106,7 @@ function calendarDaysHtml(activeIso) {
       (day) => `
       <button class="home__calendar-day${day.iso === activeIso ? " is-selected" : ""}" data-iso="${day.iso}">
         <span class="home__calendar-day-num">${day.date.getDate()}</span>
-        <span class="home__calendar-day-name">${day.label === "Today" ? "Today" : day.date.toLocaleDateString(undefined, { weekday: "long" })}</span>
+        <span class="home__calendar-day-name">${day.label === "Today" ? "Today" : day.date.toLocaleDateString(undefined, { weekday: "short" })}</span>
       </button>
     `,
     )
@@ -222,11 +209,6 @@ async function render() {
       <span class="home__orb home__orb--e"></span>
     </div>
     <div class="home">
-      <div class="home__header">
-        <h1>Family Hub</h1>
-        <div class="home__clock" id="clock"></div>
-      </div>
-
       ${rewardTiersHtml(rewardTiers, weeklyStars)}
 
       <div class="home__body">
@@ -251,8 +233,6 @@ async function render() {
       </div>
     </div>
   `;
-
-  renderClock(document.getElementById("clock"));
 
   document.getElementById("calendar-refresh").addEventListener("click", async (e) => {
     e.stopPropagation();
