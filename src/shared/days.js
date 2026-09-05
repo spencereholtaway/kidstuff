@@ -8,6 +8,16 @@ export function isoDate(date) {
   return date.toISOString().slice(0, 10);
 }
 
+/** Returns the ISO date of the Monday that starts the current week. */
+export function startOfWeekIso(from = new Date()) {
+  const d = new Date(from);
+  d.setHours(0, 0, 0, 0);
+  const day = d.getDay(); // 0 = Sun
+  const diff = day === 0 ? -6 : 1 - day; // back to Monday
+  d.setDate(d.getDate() + diff);
+  return isoDate(d);
+}
+
 /** Returns the next `count` days starting today, each as {date, iso, dayCode, label}. */
 export function upcomingDays(count = 7, from = new Date()) {
   const days = [];

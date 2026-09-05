@@ -11,11 +11,10 @@ export default async (req) => {
   }
 
   if (req.method === "POST") {
-    const authError = await requireAuth(req);
-    if (authError) return authError;
-
+    // Kids claim rewards themselves from the kiosk, so this is intentionally not parent-gated —
+    // eligibility is enforced below by the team's permanent star bank instead.
     const body = await req.json();
-    const { rewardId } = body;
+    const { rewardId, kid } = body;
     if (!rewardId) return errorResponse("rewardId is required");
 
     const rewards = await readJSON(REWARDS_KEY, []);
@@ -24,10 +23,7 @@ export default async (req) => {
 
     const stars = await computeStars();
     if (stars.joint.available < reward.starCost) {
-      return errorResponse(
-        `Not enough team stars: need ${reward.starCost}, have ${stars.joint.available}`,
-        400,
-      );
+      return errorResponse(`Not enough stars saved up: need ${reward.starCost}, have ${stars.joint.available}`, 400);
     }
 
     const redemptions = await readJSON(KEY, []);
@@ -36,12 +32,23 @@ export default async (req) => {
       rewardId,
       title: reward.title,
       starsSpent: reward.starCost,
+      kid: kid ?? null,
       redeemedAt: new Date().toISOString(),
     };
     redemptions.push(redemption);
     await writeJSON(KEY, redemptions);
 
     return jsonResponse({ redemption, stars: await computeStars() }, { status: 201 });
+  }
+
+  if (req.method === "DELETE") {
+    // Parent-only: wipes the redemption log, zeroing `spent` — the fix for a pool that went
+    // negative (which can only happen if something spent more than the bank actually had).
+    const authError = await requireAuth(req);
+    if (authError) return authError;
+
+    await writeJSON(KEY, []);
+    return jsonResponse({ stars: await computeStars() });
   }
 
   return errorResponse("method not allowed", 405);

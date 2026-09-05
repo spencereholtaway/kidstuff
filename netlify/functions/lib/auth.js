@@ -75,18 +75,18 @@ export function parseCookies(req) {
   );
 }
 
-export function sessionCookie(token) {
-  return `session=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${SESSION_TTL_SECONDS}`;
+export function sessionCookie(token, cookieName = "session") {
+  return `${cookieName}=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${SESSION_TTL_SECONDS}`;
 }
 
-export function clearSessionCookie() {
-  return `session=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0`;
+export function clearSessionCookie(cookieName = "session") {
+  return `${cookieName}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0`;
 }
 
 /** Returns an error Response if the request's session cookie is missing/invalid, else null. */
-export async function requireAuth(req) {
+export async function requireAuth(req, cookieName = "session") {
   const cookies = parseCookies(req);
-  const ok = await verifySessionToken(cookies.session);
+  const ok = await verifySessionToken(cookies[cookieName]);
   if (!ok) {
     return new Response(JSON.stringify({ error: "unauthorized" }), {
       status: 401,

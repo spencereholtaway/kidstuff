@@ -26,8 +26,8 @@ export default async (req) => {
 
     const chores = await readJSON(CHORES_KEY, []);
     const chore = chores.find((c) => c.id === choreId);
-    if (!chore) return errorResponse("chore not found", 404);
-    if (chore.kid !== kid) return errorResponse("chore is not assigned to this kid", 400);
+    if (!chore) return errorResponse("to-do not found", 404);
+    if (chore.kid !== kid && chore.kid !== "both") return errorResponse("to-do is not assigned to this kid", 400);
 
     const completions = await readJSON(COMPLETIONS_KEY, []);
     const existingIdx = completions.findIndex(

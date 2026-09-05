@@ -1,5 +1,6 @@
 .kidpage {
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   padding: 1.5rem 1.5rem 2rem;
@@ -37,8 +38,92 @@
   color: var(--accent);
 }
 
+.kidpage__rewards {
+  display: flex;
+  flex-shrink: 0;
+  gap: 0.8rem;
+  overflow-x: auto;
+}
+
+.reward-tile {
+  flex: 1;
+  min-width: 200px;
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: 0 4px 14px -8px var(--shadow);
+  padding: 0.8rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.reward-tile.is-unlocked {
+  box-shadow: 0 4px 14px -6px color-mix(in srgb, var(--kid-color, var(--accent)) 45%, transparent);
+}
+
+.reward-tile__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-weight: 600;
+}
+
+.reward-tile__count {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.reward-tile__bar {
+  position: relative;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--surface-alt);
+  overflow: hidden;
+}
+
+.reward-tile__fill,
+.reward-tile__fill-mine {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+.reward-tile__fill {
+  background: var(--accent);
+}
+
+.reward-tile.is-unlocked .reward-tile__fill {
+  background: var(--accent-strong);
+}
+
+.reward-tile__fill-mine {
+  background: var(--kid-color, var(--accent));
+}
+
+.reward-tile__status {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.reward-tile__claim {
+  align-self: flex-start;
+  border: none;
+  border-radius: 999px;
+  background: var(--kid-color, var(--accent-strong));
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0.35rem 0.9rem;
+  cursor: pointer;
+}
+
 .daynav {
   display: flex;
+  flex-shrink: 0;
   gap: 0.6rem;
   overflow-x: auto;
 }
@@ -71,10 +156,24 @@
 
 .chores {
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
   overflow-y: auto;
+}
+
+.chores__heading {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+  margin: 0.4rem 0 -0.2rem;
+  scroll-margin-top: 0.75rem;
+}
+
+.chores__heading:first-child {
+  margin-top: 0;
 }
 
 .chores__empty {
@@ -101,19 +200,31 @@
   font-size: 1.1rem;
   text-align: left;
   cursor: pointer;
+  transition:
+    background 0.15s ease,
+    opacity 0.15s ease;
+  scroll-margin-top: 0.75rem;
 }
 
 .chore-item.is-done {
-  background: var(--kid-color, #2c4a73);
-  color: #fff;
+  background: var(--surface);
+  box-shadow: none;
+  opacity: 0.5;
 }
 
 .chore-item__icon {
   font-size: 1.4rem;
 }
 
+
 .chore-item__title {
   flex: 1;
+}
+
+.chore-item.is-done .chore-item__title {
+  color: var(--text-muted);
+  text-decoration: line-through;
+  text-decoration-color: var(--text-faint);
 }
 
 .chore-item__stars {
@@ -121,8 +232,13 @@
   font-size: 0.95rem;
 }
 
+
 .chore-item__check {
   width: 1.5rem;
   text-align: center;
   font-weight: 700;
+}
+
+.chore-item.is-done .chore-item__check {
+  color: #2f7a3e;
 }

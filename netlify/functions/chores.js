@@ -2,8 +2,9 @@ import { readJSON, writeJSON, jsonResponse, errorResponse } from "./lib/store.js
 import { requireAuth } from "./lib/auth.js";
 
 const KEY = "chores/definitions.json";
-const VALID_KIDS = new Set(["jack", "jojo"]);
+const VALID_KIDS = new Set(["jack", "jojo", "both"]);
 const VALID_DAYS = new Set(["sun", "mon", "tue", "wed", "thu", "fri", "sat"]);
+const VALID_TIMES = new Set(["morning", "afternoon", "evening", "anytime"]);
 
 export default async (req) => {
   if (req.method === "GET") {
@@ -15,17 +16,18 @@ export default async (req) => {
 
   if (req.method === "POST") {
     const body = await req.json();
-    const { title, kid, days, starValue, icon } = body;
+    const { title, kid, days, starValue, icon, timeOfDay, order } = body;
 
     if (
       !title ||
       !VALID_KIDS.has(kid) ||
       !Array.isArray(days) ||
       days.length === 0 ||
-      !days.every((d) => VALID_DAYS.has(d))
+      !days.every((d) => VALID_DAYS.has(d)) ||
+      (timeOfDay !== undefined && !VALID_TIMES.has(timeOfDay))
     ) {
       return errorResponse(
-        "title, kid (jack|jojo), and days (non-empty array of weekday codes) are required",
+        "title, kid (jack|jojo|both), days (non-empty array of weekday codes), and timeOfDay (morning|afternoon|evening|anytime) are required",
       );
     }
 
@@ -37,6 +39,8 @@ export default async (req) => {
       days,
       starValue: Number(starValue) > 0 ? Number(starValue) : 1,
       icon: icon || "⭐",
+      timeOfDay: timeOfDay || "anytime",
+      order: Number.isFinite(Number(order)) ? Number(order) : Date.now(),
     };
     chores.push(chore);
     await writeJSON(KEY, chores);
@@ -47,7 +51,7 @@ export default async (req) => {
     const body = await req.json();
     const chores = await readJSON(KEY, []);
     const idx = chores.findIndex((c) => c.id === body.id);
-    if (idx === -1) return errorResponse("chore not found", 404);
+    if (idx === -1) return errorResponse("to-do not found", 404);
     chores[idx] = { ...chores[idx], ...body };
     await writeJSON(KEY, chores);
     return jsonResponse(chores[idx]);
@@ -57,7 +61,7 @@ export default async (req) => {
     const id = new URL(req.url).searchParams.get("id");
     const chores = await readJSON(KEY, []);
     const next = chores.filter((c) => c.id !== id);
-    if (next.length === chores.length) return errorResponse("chore not found", 404);
+    if (next.length === chores.length) return errorResponse("to-do not found", 404);
     await writeJSON(KEY, next);
     return jsonResponse({ ok: true });
   }

@@ -4,3 +4,5 @@ export const KIDS = {
 };
 
 export const KID_LIST = Object.values(KIDS);
+
+export const BOTH_KID = { id: "both", displayName: "Both", avatar: "👨‍👩‍👧‍👦", color: "var(--accent)" };
