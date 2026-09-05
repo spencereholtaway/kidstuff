@@ -5,9 +5,9 @@ const COMPLETIONS_KEY = "chores/completions.json";
 const PARENT_CHORE_ID = "__parent__";
 const PARENT_KID = "dad";
 
-/** Lets a parent add stars to their own pool directly (for things outside the chore list) —
- * not attributed to either kid — recorded as completions tagged `source: "parent"` so they
- * flow into the combined weekly/team totals (reward tiers, joint pool) exactly like chore
+/** Lets a parent add or subtract stars from their own pool directly (for things outside the
+ * chore list) — not attributed to either kid — recorded as completions tagged `source: "parent"`
+ * so they flow into the combined weekly/team totals (reward tiers, joint pool) exactly like chore
  * stars, while staying easy to tell apart and undo if added by mistake. */
 export default async (req) => {
   const authError = await requireAuth(req);
@@ -15,8 +15,9 @@ export default async (req) => {
 
   if (req.method === "POST") {
     const { amount, date } = await req.json();
-    if (!(Number(amount) > 0) || !date) {
-      return errorResponse("a positive amount and date (YYYY-MM-DD) are required");
+    const amt = Number(amount);
+    if (!Number.isInteger(amt) || amt === 0 || !date) {
+      return errorResponse("a non-zero whole number amount and date (YYYY-MM-DD) are required");
     }
 
     const completions = await readJSON(COMPLETIONS_KEY, []);
@@ -25,7 +26,7 @@ export default async (req) => {
       choreId: PARENT_CHORE_ID,
       kid: PARENT_KID,
       date,
-      starValue: Number(amount),
+      starValue: amt,
       completedAt: new Date().toISOString(),
       source: "parent",
     };
