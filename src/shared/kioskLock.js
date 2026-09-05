@@ -19,7 +19,7 @@ export async function ensureKioskUnlocked() {
             <h1>Enter PIN</h1>
             ${message ? `<p class="kiosk-lock__error">${message}</p>` : ""}
             <form class="kiosk-lock__form" id="kiosk-lock-form">
-              <input name="pin" type="password" inputmode="numeric" autocomplete="off" placeholder="••••" autofocus />
+              <input name="pin" type="password" autocomplete="off" placeholder="••••" autofocus />
               <button type="submit">Unlock</button>
             </form>
           </div>

@@ -70,7 +70,7 @@ function renderLogin(message = "") {
       <h1>Parent login</h1>
       ${message ? `<p class="notice notice--error">${message}</p>` : ""}
       <form id="login-form">
-        <input name="pin" type="password" inputmode="numeric" autocomplete="off" placeholder="PIN" autofocus />
+        <input name="pin" type="password" autocomplete="off" placeholder="PIN" autofocus />
         <button type="submit" class="btn btn--primary">Log in</button>
       </form>
     </div>
