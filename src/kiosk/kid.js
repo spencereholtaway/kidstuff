@@ -6,6 +6,7 @@ import { api } from "../shared/api.js";
 import { DAYPARTS } from "../shared/dayparts.js";
 import { buildRewardTiers } from "../shared/rewardTiers.js";
 import { ensureKioskUnlocked } from "../shared/kioskLock.js";
+import { flipSnapshot, flipAnimate } from "../shared/flip.js";
 
 const app = document.getElementById("app");
 const params = new URLSearchParams(window.location.search);
@@ -85,9 +86,17 @@ function isDone(choreId, iso) {
 
 async function toggleChore(choreId) {
   const wasDone = isDone(choreId, selectedIso);
+  const btn = document.querySelector(`.chore-item[data-chore-id="${choreId}"]`);
+  btn?.classList.toggle("is-done"); // instant feedback while the request is in flight
+
+  const container = document.querySelector(".chores");
+  const snapshot = flipSnapshot(container, ".chore-item", (el) => el.dataset.choreId);
+
   await api.post("/completions", { choreId, kid: kid.id, date: selectedIso });
   await loadData();
   render();
+
+  flipAnimate(document.querySelector(".chores"), ".chore-item", (el) => el.dataset.choreId, snapshot);
   if (!wasDone) scrollToFirstUndone("smooth");
 }
 
@@ -156,7 +165,7 @@ function render() {
       <span class="chore-item__icon">${chore.icon}</span>
       <span class="chore-item__title">${chore.title}</span>
       <span class="chore-item__stars">${chore.starValue}⭐</span>
-      <span class="chore-item__check">${done ? "✓" : ""}</span>
+      <span class="chore-item__check"></span>
     `;
     item.addEventListener("click", () => toggleChore(chore.id));
     container.appendChild(item);

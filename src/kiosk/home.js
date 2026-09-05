@@ -6,6 +6,7 @@ import { upcomingDays, isoDate, startOfWeekIso } from "../shared/days.js";
 import { DAYPARTS } from "../shared/dayparts.js";
 import { buildRewardTiers } from "../shared/rewardTiers.js";
 import { ensureKioskUnlocked } from "../shared/kioskLock.js";
+import { flipSnapshot, flipAnimate } from "../shared/flip.js";
 
 const app = document.getElementById("app");
 let refreshing = false;
@@ -179,7 +180,7 @@ function chorePanelHtml(kid, choresToday, completions) {
                 <span class="home-chore__icon">${chore.icon}</span>
                 <span class="home-chore__title">${chore.title}</span>
                 <span class="home-chore__stars">${chore.starValue}⭐</span>
-                <span class="home-chore__check">${done ? "✓" : ""}</span>
+                <span class="home-chore__check"></span>
               </button>
             `;
             })
@@ -293,8 +294,16 @@ async function render() {
     btn.addEventListener("click", async () => {
       const { choreId, kidId } = btn.dataset;
       const wasDone = btn.classList.contains("is-done");
+      btn.classList.toggle("is-done"); // instant feedback while the request is in flight
+
+      const list = document.querySelector(`.home__kidpanel-list[data-kid-id="${kidId}"]`);
+      const snapshot = flipSnapshot(list, ".home-chore", (el) => el.dataset.choreId);
+
       await api.post("/completions", { choreId, kid: kidId, date: todayIso });
       await render();
+
+      const newList = document.querySelector(`.home__kidpanel-list[data-kid-id="${kidId}"]`);
+      flipAnimate(newList, ".home-chore", (el) => el.dataset.choreId, snapshot);
       if (!wasDone) scrollPanelToFirstUndone(kidId, "smooth");
     });
   });

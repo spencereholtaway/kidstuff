@@ -4,9 +4,12 @@ const STORE_NAME = "family-data";
 
 // Netlify Blobs defaults to eventual consistency, which can serve a stale read right after a
 // write (e.g. a chore toggle immediately followed by a re-render) — force strong consistency
-// since every read here feeds a read-modify-write.
+// since every read here feeds a read-modify-write. The local `netlify dev` blob emulator
+// doesn't support strong-consistency reads against its own file-backed store (they come back
+// empty), so only force it in deployed environments — NETLIFY_DEV is set by the CLI locally.
 export function store() {
-  return getStore(STORE_NAME, { consistency: "strong" });
+  const options = process.env.NETLIFY_DEV === "true" ? {} : { consistency: "strong" };
+  return getStore(STORE_NAME, options);
 }
 
 export async function readJSON(key, fallback) {
